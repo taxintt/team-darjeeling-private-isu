@@ -27,49 +27,51 @@ import (
 var (
 	db    *sqlx.DB
 	store *gsm.MemcacheStore
-	fmap template.FuncMap = template.FuncMap{
+	fmap  template.FuncMap = template.FuncMap{
 		"imageURL": imageURL,
 	}
-	loginTemplate *template.Template = template.Must(template.ParseFiles(
-		getTemplPath("layout.html"),
-		getTemplPath("login.html"),
-	)
-	registerTemplate *template.Template = template.Must(template.ParseFiles(
-		getTemplPath("layout.html"),
-		getTemplPath("register.html"),
-	)
-	indexTemplate *template.Template =
-		template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
+	loginTemplate *template.Template = template.Must(
+		template.ParseFiles(
 			getTemplPath("layout.html"),
-			getTemplPath("index.html"),
-			getTemplPath("posts.html"),
-			getTemplPath("post.html"),
-		)
+			getTemplPath("login.html"),
+		),
 	)
-	accountTemplate *template.Template =
-		template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
+	registerTemplate *template.Template = template.Must(
+		template.ParseFiles(
 			getTemplPath("layout.html"),
-			getTemplPath("user.html"),
-			getTemplPath("posts.html"),
-			getTemplPath("post.html"),
-		)
+			getTemplPath("register.html"),
+		),
 	)
-	postsTemplate *template.Template =
-		template.Must(template.New("posts.html").Funcs(fmap).ParseFiles(
-			getTemplPath("posts.html"),
-			getTemplPath("post.html"),
-		)
-	)
-	postIdTemplate *template.Template =
-		template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
-			getTemplPath("layout.html"),
-			getTemplPath("post_id.html"),
-			getTemplPath("post.html"),
-		)
-	)
-	bannedTemplate *template.Template = template.Must(template.ParseFiles(
+	indexTemplate *template.Template = template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
 		getTemplPath("layout.html"),
-		getTemplPath("banned.html"),
+		getTemplPath("index.html"),
+		getTemplPath("posts.html"),
+		getTemplPath("post.html"),
+	),
+	)
+	accountTemplate *template.Template = template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
+		getTemplPath("layout.html"),
+		getTemplPath("user.html"),
+		getTemplPath("posts.html"),
+		getTemplPath("post.html"),
+	),
+	)
+	postsTemplate *template.Template = template.Must(template.New("posts.html").Funcs(fmap).ParseFiles(
+		getTemplPath("posts.html"),
+		getTemplPath("post.html"),
+	),
+	)
+	postIdTemplate *template.Template = template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
+		getTemplPath("layout.html"),
+		getTemplPath("post_id.html"),
+		getTemplPath("post.html"),
+	),
+	)
+	bannedTemplate *template.Template = template.Must(
+		template.ParseFiles(
+			getTemplPath("layout.html"),
+			getTemplPath("banned.html"),
+		),
 	)
 )
 
@@ -425,7 +427,7 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 
 	results := []Post{}
 
-	err := db.Select(&results, "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC")
+	err := db.Select(&results, "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` force index (idx_created_at_desc) ORDER BY `created_at` DESC")
 	if err != nil {
 		log.Print(err)
 		return
@@ -702,6 +704,16 @@ func getImage(w http.ResponseWriter, r *http.Request) {
 			log.Print(err)
 			return
 		}
+
+		// 画像の取得に成功したらnginxにキャッシュさせるためにファイルを/public/img/以下に書き出す
+		imagePath := fmt.Sprintf("/home/isucon/private_isu/webapp/public/image/%d.%s", pid, ext)
+		f, err := os.OpenFile(imagePath, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			log.Print(err)
+		}
+		f.Write(post.Imgdata)
+		defer f.Close()
+
 		return
 	}
 
