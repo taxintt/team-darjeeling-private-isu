@@ -25,12 +25,12 @@ import (
 )
 
 var (
-	db    *sqlx.DB
-	store *gsm.MemcacheStore
+	db            *sqlx.DB
+	store         *gsm.MemcacheStore
 	loginTemplate *template.Template = template.Must(template.ParseFiles(
 		getTemplPath("layout.html"),
 		getTemplPath("login.html"),
-	)
+	))
 )
 
 const (
