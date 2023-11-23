@@ -697,6 +697,16 @@ func getImage(w http.ResponseWriter, r *http.Request) {
 			log.Print(err)
 			return
 		}
+
+		// 画像の取得に成功したらnginxにキャッシュさせるためにファイルを/public/img/以下に書き出す
+		imagePath := fmt.Sprintf("/home/isucon/private_isu/webapp/public/image/%d.%s", pid, ext)
+		f, err := os.OpenFile(imagePath, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			log.Print(err)
+		}
+		f.Write(post.Imgdata)
+		defer f.Close()
+
 		return
 	}
 
