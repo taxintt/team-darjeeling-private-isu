@@ -42,30 +42,34 @@ var (
 			getTemplPath("register.html"),
 		),
 	)
-	indexTemplate *template.Template = template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
-		getTemplPath("layout.html"),
-		getTemplPath("index.html"),
-		getTemplPath("posts.html"),
-		getTemplPath("post.html"),
-	),
+	indexTemplate *template.Template = template.Must(
+		template.New("layout.html").Funcs(fmap).ParseFiles(
+			getTemplPath("layout.html"),
+			getTemplPath("index.html"),
+			getTemplPath("posts.html"),
+			getTemplPath("post.html"),
+		),
 	)
-	accountTemplate *template.Template = template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
-		getTemplPath("layout.html"),
-		getTemplPath("user.html"),
-		getTemplPath("posts.html"),
-		getTemplPath("post.html"),
-	),
+	accountTemplate *template.Template = template.Must(
+		template.New("layout.html").Funcs(fmap).ParseFiles(
+			getTemplPath("layout.html"),
+			getTemplPath("user.html"),
+			getTemplPath("posts.html"),
+			getTemplPath("post.html"),
+		),
 	)
-	postsTemplate *template.Template = template.Must(template.New("posts.html").Funcs(fmap).ParseFiles(
-		getTemplPath("posts.html"),
-		getTemplPath("post.html"),
-	),
+	postsTemplate *template.Template = template.Must(
+		template.New("posts.html").Funcs(fmap).ParseFiles(
+			getTemplPath("posts.html"),
+			getTemplPath("post.html"),
+		),
 	)
-	postIdTemplate *template.Template = template.Must(template.New("layout.html").Funcs(fmap).ParseFiles(
-		getTemplPath("layout.html"),
-		getTemplPath("post_id.html"),
-		getTemplPath("post.html"),
-	),
+	postIdTemplate *template.Template = template.Must(
+		template.New("layout.html").Funcs(fmap).ParseFiles(
+			getTemplPath("layout.html"),
+			getTemplPath("post_id.html"),
+			getTemplPath("post.html"),
+		),
 	)
 	bannedTemplate *template.Template = template.Must(
 		template.ParseFiles(
