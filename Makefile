@@ -67,7 +67,7 @@ pt-query-digest:
 
 rotate-mysql-log:
 	ssh isu01 sudo sh -c 'test -f /var/log/mysql/mysql-slow.log && mv -f /var/log/mysql/mysql-slow.log /var/log/mysql/mysql-slow.log.$(TS) || true'
-	ssh isu01 sudo sh -c 'systemctl restart mysql'
+	ssh isu01 'sudo systemctl restart mysql'
 
 after-bench: rotate-mysql-log rotate-nginx
 
