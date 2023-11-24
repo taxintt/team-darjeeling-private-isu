@@ -163,7 +163,7 @@ func validateUser(accountName, password string) bool {
 // 取り急ぎPHPのescapeshellarg関数を参考に自前で実装
 // cf: http://jp2.php.net/manual/ja/function.escapeshellarg.php
 func escapeshellarg(arg string) string {
-	return "'" + strings.Replace(arg, "'", "'\\''", -1) + "'"
+	return "'" + strings.ReplaceAll(arg, "'", "'\\''") + "'"
 }
 
 func digest(src string) string {
@@ -275,11 +275,13 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 
 func imageURL(p Post) string {
 	ext := ""
-	if p.Mime == "image/jpeg" {
+
+	switch p.Mime {
+	case "image/jpeg":
 		ext = ".jpg"
-	} else if p.Mime == "image/png" {
+	case "image/png":
 		ext = ".png"
-	} else if p.Mime == "image/gif" {
+	case "image/gif":
 		ext = ".gif"
 	}
 
@@ -311,7 +313,7 @@ func getTemplPath(filename string) string {
 	return path.Join("templates", filename)
 }
 
-func getInitialize(w http.ResponseWriter, r *http.Request) {
+func getInitialize(w http.ResponseWriter, _ *http.Request) {
 	dbInitialize()
 	w.WriteHeader(http.StatusOK)
 }
